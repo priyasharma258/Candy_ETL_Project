@@ -1,0 +1,95 @@
+SELECT * FROM `projectcandy.projectcandy.project101` LIMIT 1000
+
+# Which product has the highest sales ?
+
+SELECT Product_Name ,max(Sales)
+from `projectcandy.projectcandy.project101`
+GROUP BY Product_Name;
+
+# How many products have sales above the average ? 
+
+SELECT COUNT(*) FROM `projectcandy.projectcandy.project101`
+WHERE Sales > (SELECT AVG(Sales)  FROM `projectcandy.projectcandy.project101`) ;
+
+# Which products have the highest sales in 2021 ?
+
+SELECT * from `projectcandy.projectcandy.project101`
+where Shipping_years = 2021  AND Sales = (SELECT MAX(Sales) FROM `projectcandy.projectcandy.project101`
+                                                 WHERE Shipping_years = 2021) ;
+
+# what is the total sales for each year ?
+
+
+select Shipping_years,sum(Sales) AS total_sales 
+from `projectcandy.projectcandy.project101`
+GROUP BY Shipping_years
+order by Shipping_years ;                                           
+ 
+  # What is the most used shipping mode ?
+ select Ship_mode , count(*)
+ from `projectcandy.projectcandy.project101`
+ GROUP BY Ship_Mode
+ order by  Ship_Mode desc;
+
+ # show counts of order delay status?
+
+select count(Orders_delay) as ord
+from `projectcandy.projectcandy.project101`
+group by Orders_delay;
+
+
+# Which region and country generated the highest gross profit? 
+
+select Country_Region,Region, sum(Gross_Profit) AS total_pro
+from `projectcandy.projectcandy.project101`
+GROUP BY Region, Country_Region
+ORDER BY total_pro desc ;
+
+# which customer brought expensive products by unit_price
+
+Select  Customer_ID, Product_Name, Unit_price from `projectcandy.projectcandy.project101`
+where Unit_Price= (select max(Unit_Price) from`projectcandy.projectcandy.project101`) ;
+
+
+# What are the total sales per month and year?
+
+select Sum(Sales) AS s,
+extract(Year FROM Order_Date) As Year,
+extract (month from Order_Date) AS month,
+format_date('%B',Order_Date) AS month_name
+from `projectcandy.projectcandy.project101`
+group by year, month , month_name
+Order by year, month , month_name ;
+
+# What is the average sales and maximum profit for each Factory and Division ?
+
+Select Factory , Division,
+AVG(Sales) over(partition by Factory, Division) AS avg_sales,
+MAX(Gross_Profit) over (partition by Factory, Division) AS max_profit
+from `projectcandy.projectcandy.project101`
+Order by Factory,Division
+
+
+# How many total orders are there for each Factory and Division ?
+
+SELECT DISTINCT 
+Factory, Division, 
+COUNT(*) OVER (PARTITION BY Factory, Division) AS Total_Orders
+FROM `projectcandy.projectcandy.project101`
+
+# How many times was each product ordered in each Division ?
+
+Select Division, Product_Name
+count(*) over(PARTITION BY Division, Product_Name) AS total 
+From `projectcandy.projectcandy.project101` ;
+
+# How many products were produced by each Division and Factory ?
+
+SELECT Factory,Division,Count(Division) As total_Product
+From `projectcandy.projectcandy.project101`
+group by Division, Factory ;
+
+# Which factory had the highest total sales ?
+SELECT factory, MAX(total_sales) AS highest_sales
+FROM `projectcandy.projectcandy.project101`
+GROUP BY factory ;
